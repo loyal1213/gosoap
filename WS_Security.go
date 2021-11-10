@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"crypto/sha1"
 	"github.com/elgs/gostrgen"
+	"fmt"
 )
 
 /*************************
@@ -58,18 +59,24 @@ func NewSecurity(username, passwd string) security {
 	charSet := gostrgen.Lower | gostrgen.Digit
 
 	nonceSeq, _ := gostrgen.RandGen(charsToGenerate, charSet, "", "")
+	fmt.Println("nonceSeq: ",string(nonceSeq))
+	nonceSeq = "81jcwjjjiubjy0ugi6zus6dw9zk3ho0p";
+	dt, _ := time.Parse("2016-01-02 15:04:05", "2018-04-23 12:24:51")
+	fmt.Println("dt: ",dt)
 	auth := security{
 		Auth:wsAuth{
 			Username:username,
 			Password:password {
 				Type:passwordType,
-				Password:generateToken(username, nonceSeq, time.Now().UTC(), passwd),
+				// Password:generateToken(username, nonceSeq, time.Now().UTC(), passwd),
+				Password:generateToken(username, nonceSeq, dt, passwd),
 			},
 			Nonce:nonce {
 				Type:encodingType,
 				Nonce: nonceSeq,
 			},
-			Created: time.Now().UTC().Format(time.RFC3339Nano),
+			// Created: time.Now().UTC().Format(time.RFC3339Nano),
+			Created: dt.Format(time.RFC3339Nano),
 		},
 	}
 
@@ -80,12 +87,12 @@ func NewSecurity(username, passwd string) security {
 func generateToken(Username string, Nonce string, Created time.Time, Password string) string {
 
 	sDec, _ := base64.StdEncoding.DecodeString(Nonce)
-
+	fmt.Println("Nonce: ",Nonce,", sDec",sDec)
 
 	hasher := sha1.New()
 	//hasher.Write([]byte((base64.StdEncoding.EncodeToString([]byte(Nonce)) + Created.Format(time.RFC3339) + Password)))
-	hasher.Write([]byte(string(sDec) + Created.Format(time.RFC3339Nano) + Password))
-
+	res,err := hasher.Write([]byte(string(sDec) + Created.Format(time.RFC3339Nano) + Password))
+	fmt.Println("Password: ",Password,", res: ",res,", err: ",err)
 	return base64.StdEncoding.EncodeToString(hasher.Sum(nil))
 }
 

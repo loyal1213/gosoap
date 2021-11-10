@@ -4,6 +4,7 @@ import (
 	"github.com/beevik/etree"
 	"log"
 	"encoding/xml"
+	"fmt"
 )
 
 type SoapMessage string
@@ -241,7 +242,7 @@ func (msg *SoapMessage) AddWSSecurity(username, password string) {
 	Getting an WS-Security struct representation
 	 */
 	auth := NewSecurity(username, password)
-
+	fmt.Println("auth: ",auth)
 	/*
 	Adding WS-Security namespaces to root element of SOAP message
 	 */
@@ -253,6 +254,7 @@ func (msg *SoapMessage) AddWSSecurity(username, password string) {
 		//log.Printf("error: %v\n", err.Error())
 		panic(err)
 	}
+	fmt.Println("soapReq: ",string(soapReq))
 
 	/*
 	Adding WS-Security struct to SOAP header
